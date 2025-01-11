@@ -9,6 +9,7 @@ const wrapAsync = require("./utils/wrapAsync.js");
 const ExpressError= require("./utils/ExpressError.js");
 const MONGO_URL="mongodb://127.0.0.1:27017/wanderlust";
 const {listingSchema}= require("./schema.js");
+const Review = require("./models/review.js");
 
 main()
 .then(()=>{
@@ -94,6 +95,18 @@ app.delete("/listings/:id", wrapAsync(async (req, res) => {
     console.log(deletedListing);
     res.redirect("/listings");
   }));
+//Reviews--Post route
+
+app.post("/listings/:id/reviews",async(req,res)=>{
+  let listing = await Listing.findById(req.params.id);
+  let newReview = new Review(req.body.review);
+  listing.reviews.push(newReview);
+  await newReview.save();
+  await listing.save();
+
+  res.redirect(`/listings/${listing._id}`);
+});
+
   
 
 // app.get("/testListing",async (req,res)=>{
@@ -113,8 +126,8 @@ app.all("*",(req,res,next)=>{
 });
 
 app.use((err,req,res,next)=>{
-  let{statusCode,message}=err;
-  res.render("error.ejs");
+  let{statusCode = 500,message="Something went wrong!"}=err;
+  res.status(statusCode).render("error.ejs",{message});
   //res.status(statusCode).send(message);
 });
 
