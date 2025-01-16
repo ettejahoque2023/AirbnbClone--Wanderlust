@@ -80,6 +80,8 @@ app.use((err,req,res,next)=>{
   //res.status(statusCode).send(message);
 });
 
+//console.log(res.locals.redirectUrl);
+
 app.listen(8080,()=>{
     console.log("server is listening to port 8080");
 });
